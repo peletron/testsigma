@@ -1,0 +1,55 @@
+namespace: testsigma-server
+testsigma-server:
+  defines: runnable
+  metadata:
+    name: testsigma-server
+    description: This is the server-side of Testsigma, an automated testing platform.
+    icon: https://emojiapi.dev/api/v1/globe_with_meridians.svg
+  containers:
+    testsigma-server:
+      build: .
+  services:
+    web-port:
+      container: testsigma-server
+      port: <- $testsigma-web-port
+      host-port: <- $testsigma-web-port
+      publish: false
+      protocol: TCP
+      description: Port exposed for the web interface of the application.
+    server-port:
+      container: testsigma-server
+      port: <- $testsigma-server-port
+      host-port: <- $testsigma-server-port
+      publish: false
+      protocol: TCP
+      description: Port exposed for the server functionality of the application.
+  connections:
+    mysql-connection:
+      target: monk-mysql/db
+      service: monk-mysql-db
+  variables:
+    testsigma-server-port:
+      env: TESTSIGMA_SERVER_PORT
+      type: int
+      description: Port for the server functionality of the application.
+      value: '9090'
+    is-docker-env:
+      env: IS_DOCKER_ENV
+      type: boolean
+      description: Specifies if the application is running in a Docker environment.
+      value: 'true'
+    mysql-host-name:
+      env: MYSQL_HOST_NAME
+      type: string
+      description: Hostname for the MySQL database connection.
+      value: <- connection-hostname("mysql-connection")
+    ts-data-dir:
+      env: TS_DATA_DIR
+      type: string
+      description: Path to the ts_data directory in the container.
+      value: /opt/app/ts_data
+    testsigma-web-port:
+      env: TESTSIGMA_WEB_PORT
+      type: int
+      description: Port for the web interface of the application.
+      value: '443'
